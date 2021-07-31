@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using Sandbox;
 
@@ -6,9 +7,21 @@ namespace ReplicatorMelons {
   [Library("ent_replicatormelon", Title = "Replicator Melon", Spawnable = true )]
   public class ReplicatorMelon : BasePhysics {
 
+    // lifetime
+
+    private static HashSet<ReplicatorMelon> ALL = new HashSet<ReplicatorMelon>();
+
     public override void Spawn() {
       base.Spawn();
+
       SetModel("models/sbox_props/watermelon/watermelon.vmdl");
+      ALL.Add(this);
+    }
+
+    protected override void OnDestroy() {
+      base.OnDestroy();
+
+      ALL.Remove(this);
     }
 
     // target
@@ -16,7 +29,7 @@ namespace ReplicatorMelons {
     private Entity Target {get; set;}
     private DateTime LastTargetRefresh {get; set;}
 
-    protected Entity FindTarget() {
+    private Entity FindTarget() {
       Entity closest = null;
       foreach (var ent in Entity.All) {
         if (!IsValidTarget(ent)) continue;
@@ -28,16 +41,21 @@ namespace ReplicatorMelons {
     }
 
     protected bool IsValidTarget(Entity ent) {
-      if (ent == null) return false;
+      if (ent.IsValid()) return false;
       if (ent is Player && ent.Health <= 0) return false;
+      if (ent is Prop) {
+        if (!CanCreateMelon()) return false;
+        var tr = Trace.Ray(this.Position, ent.Position).WorldOnly().Run();
+        if (tr.Entity != null && tr.Entity.IsWorld) return false;
+      }
       return ent is Player || ent is Prop;
     }
 
-    // ai
+    // tick
 
     [Event.Tick.Server]
     private void Tick() {
-      if (LastTargetRefresh == null || (DateTime.Now - LastTargetRefresh).Seconds >= 1 || !IsValidTarget(Target)) {
+      if (LastTargetRefresh == null || (DateTime.Now - LastTargetRefresh).Seconds >= 1) {
         Target = FindTarget();
         LastTargetRefresh = DateTime.Now;
       }
@@ -46,7 +64,17 @@ namespace ReplicatorMelons {
       }
     }
 
-    // collisions
+    // create melons
+
+    public static Boolean CanCreateMelon() {
+      return ALL.Count < Game.MaxMelons;
+    }
+
+    public static ReplicatorMelon CreateMelon(Vector3 pos) {
+      return new ReplicatorMelon {
+          Position = pos
+      };
+    }
 
     protected override void OnPhysicsCollision(CollisionEventData eventData) {
       base.OnPhysicsCollision(eventData);
@@ -60,15 +88,13 @@ namespace ReplicatorMelons {
           Damage = ent.Health,
           Attacker = this
         });
-        new ReplicatorMelon {
-          Position = pos + new Vector3 {z = 10}
-        };
-      } else {
+        if (CanCreateMelon()) {
+          CreateMelon(pos  + new Vector3 {z = 10});
+        }
+      } else if (CanCreateMelon()) {
         var pos = ent.Position;
         ent.Delete();
-        new ReplicatorMelon {
-          Position = pos
-        };
+        CreateMelon(pos);
       }
     }
   }
