@@ -3,21 +3,31 @@
 namespace ReplicatorMelons {
 
 	partial class Player : Sandbox.Player {
+
 		public override void Respawn() {
 			SetModel("models/citizen/citizen.vmdl");
 			Controller = new WalkController();
 			Animator = new StandardPlayerAnimator();
-			Camera = new ThirdPersonCamera();
+			Camera ??= new FirstPersonCamera();
 			EnableAllCollisions = true;
 			EnableDrawing = true;
 			EnableHideInFirstPerson = true;
 			EnableShadowInFirstPerson = true;
+			Dress();
 			base.Respawn();
 		}
 
 		public override void Simulate(Client cl) {
 			base.Simulate(cl);
 			SimulateActiveChild(cl, ActiveChild);
+
+			if (Input.Pressed(InputButton.View)) {
+				if (Camera is FirstPersonCamera) {
+					Camera = new ThirdPersonCamera();
+				} else {
+					Camera = new FirstPersonCamera();
+				}
+			}
 
 			if (IsServer) {
 				if (Input.Pressed(InputButton.Reload)) {
@@ -26,7 +36,7 @@ namespace ReplicatorMelons {
 							ent.Delete();
 						}
 					}
-				} else if (Input.Pressed(InputButton.Attack1) || Input.Down(InputButton.Attack2)) {
+				} else if (ReplicatorMelon.CanCreateMelon() && (Input.Pressed(InputButton.Attack1) || Input.Down(InputButton.Attack2))) {
 					var melon = new ReplicatorMelon();
 					var tr = Trace.Ray(EyePos, EyePos + EyeRot.Forward*5000)
 						.WorldOnly()

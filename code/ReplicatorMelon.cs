@@ -41,7 +41,7 @@ namespace ReplicatorMelons {
     }
 
     protected bool IsValidTarget(Entity ent) {
-      if (ent.IsValid()) return false;
+      if (!ent.IsValid()) return false;
       if (ent is Player && ent.Health <= 0) return false;
       if (ent is Prop) {
         if (!CanCreateMelon()) return false;
