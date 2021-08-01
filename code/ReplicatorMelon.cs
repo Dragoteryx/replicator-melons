@@ -9,19 +9,21 @@ namespace ReplicatorMelons {
 
     // lifetime
 
-    private static HashSet<ReplicatorMelon> ALL = new HashSet<ReplicatorMelon>();
+    internal static HashSet<ReplicatorMelon> AllMelons = new HashSet<ReplicatorMelon>();
+    //internal static HashSet<Entity> Targets = new HashSet<Entity>();
 
     public override void Spawn() {
       base.Spawn();
 
       SetModel("models/sbox_props/watermelon/watermelon.vmdl");
-      ALL.Add(this);
+
+      AllMelons.Add(this);
     }
 
     protected override void OnDestroy() {
       base.OnDestroy();
 
-      ALL.Remove(this);
+      AllMelons.Remove(this);
     }
 
     // target
@@ -67,7 +69,7 @@ namespace ReplicatorMelons {
     // create melons
 
     public static Boolean CanCreateMelon() {
-      return ALL.Count < Game.MaxMelons;
+      return AllMelons.Count < Game.MaxMelons;
     }
 
     public static ReplicatorMelon CreateMelon(Vector3 pos) {

@@ -6,7 +6,7 @@ namespace ReplicatorMelons {
 	public partial class Game : Sandbox.Game {
 
 		[ConVar.Replicated("replicatormelons_max")]
-		public static int MaxMelons {get; set;} = 30;
+		public static int MaxMelons {get; set;} = 150;
 
 		public Game() {			
 			if (IsServer) {

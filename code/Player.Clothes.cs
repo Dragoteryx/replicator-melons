@@ -3,12 +3,12 @@ using Sandbox;
 namespace ReplicatorMelons {
 
   partial class Player {
-    ModelEntity Pants;
-    ModelEntity Jacket;
-    ModelEntity Shoes;
-    ModelEntity Hat;
 
-    bool Dressed = false;
+    private bool Dressed = false;
+    private ModelEntity Pants;
+    private ModelEntity Jacket;
+    private ModelEntity Shoes;
+    private ModelEntity Hat;
 
     // copied from garry's code, let's not reivent the wheel (thanks btw)
     public void Dress() {
@@ -27,11 +27,13 @@ namespace ReplicatorMelons {
           "models/citizen_clothes/trousers/trousers_tracksuit.vmdl",
           "models/citizen_clothes/shoes/shorts.cargo.vmdl",
         });
+
         Pants = new ModelEntity();
         Pants.SetModel(model);
         Pants.SetParent(this, true);
         Pants.EnableShadowInFirstPerson = true;
         Pants.EnableHideInFirstPerson = true;
+        
         SetBodyGroup("Legs", 1);
       }
 

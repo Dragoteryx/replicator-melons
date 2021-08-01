@@ -31,17 +31,12 @@ namespace ReplicatorMelons {
 
 			if (IsServer) {
 				if (Input.Pressed(InputButton.Reload)) {
-					foreach (var ent in Entity.All) {
-						if (ent is ReplicatorMelon) {
-							ent.Delete();
-						}
+					foreach (var ent in ReplicatorMelon.AllMelons) {
+						ent.Delete();
 					}
 				} else if (ReplicatorMelon.CanCreateMelon() && (Input.Pressed(InputButton.Attack1) || Input.Down(InputButton.Attack2))) {
-					var melon = new ReplicatorMelon();
-					var tr = Trace.Ray(EyePos, EyePos + EyeRot.Forward*5000)
-						.WorldOnly()
-						.Run();
-					melon.Position = tr.EndPos - EyeRot.Forward*25;
+					var tr = Trace.Ray(EyePos, EyePos + EyeRot.Forward*5000).WorldOnly().Run();
+					ReplicatorMelon.CreateMelon(tr.EndPos - EyeRot.Forward*25);
 				}
 			}
 		}

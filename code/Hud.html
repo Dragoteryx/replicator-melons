@@ -1,13 +1,18 @@
 <link rel="stylesheet" href="hud.scss">
 
 <div>
-	<div class="info">
+	<div class="panel info">
 		<text>- Left click to spawn a single melon
 - Right click to spawn a lot of them
 - Reload to clear the map
 - Use the ConVar "replicatormelons_max" to change
   the maximum number of melons on the map</text>
-	</div>	
+	</div>
+
+	<!-- of course binding is broken, what did I expect? -->
+	<!--<div class="panel count">
+		<text @text="MelonsCount"/>
+	</div>-->
 
 	<chatbox></chatbox>
 </div> 
